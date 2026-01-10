@@ -1,14 +1,21 @@
 {
-  "name": "imnotyourson-photos",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "astro": "^5.16.8"
-  }
+	"name": "imnotyourson-photos",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro build && wrangler pages dev",
+		"astro": "astro",
+		"deploy": "astro build && wrangler pages deploy",
+		"cf-typegen": "wrangler types"
+	},
+	"dependencies": {
+		"@astrojs/cloudflare": "^12.6.12",
+		"astro": "^5.16.8"
+	},
+	"devDependencies": {
+		"@types/node": "^25.0.5",
+		"wrangler": "^4.58.0"
+	}
 }
