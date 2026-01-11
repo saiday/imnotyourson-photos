@@ -6,11 +6,9 @@ import cloudflare from '@astrojs/cloudflare';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://photos.imnotyourson.com',
+  output: 'server',
   adapter: cloudflare({
-    platformProxy: {
-      enabled: true
-    },
-
-    imageService: "cloudflare"
+    mode: 'directory',
+    imageService: 'cloudflare'
   })
 });
