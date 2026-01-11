@@ -12,6 +12,7 @@ const postsCollection = defineCollection({
       alt: z.string().optional(),
     })),
     featured_photo: z.string().optional(),
+    show_in_homepage: z.boolean().optional().default(true),
   }),
 });
 

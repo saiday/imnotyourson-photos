@@ -4,10 +4,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import { getImageUrl, getImageSrcset, getImageSizes } from '../utils/images';
 
-// Get all public posts with featured photos
+// Get all public posts with featured photos for homepage
 const allPosts = await getCollection('posts');
 const publicPosts = allPosts
-  .filter(post => post.data.public && post.data.featured_photo)
+  .filter(post => {
+    const showInHomepage = post.data.show_in_homepage ?? true;
+    return post.data.public && post.data.featured_photo && showInHomepage;
+  })
   .sort((a, b) => b.data.created_at.getTime() - a.data.created_at.getTime());
 
 const featuredPhotos = publicPosts.map(post => ({
@@ -71,7 +74,7 @@ const description = 'It was me, I let the dogs out.';
   .hero-image-link {
     position: relative;
     display: block;
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 5 / 3;
     overflow: hidden;
     background-color: var(--color-border);
   }
@@ -91,7 +94,7 @@ const description = 'It was me, I let the dogs out.';
 
   .hero-content {
     position: absolute;
-    bottom: 2rem;
+    bottom: 1.25rem;
     left: 0;
     right: 0;
     text-align: center;
@@ -171,7 +174,7 @@ const description = 'It was me, I let the dogs out.';
     }
 
     .hero-content {
-      bottom: 1.5rem;
+      bottom: 1rem;
     }
   }
 </style>
