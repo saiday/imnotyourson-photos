@@ -1,11 +1,123 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import { getImageUrl, getImageSrcset, getImageSizes } from '../utils/images';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// For MVP: using a featured photo
+// TODO: Make this dynamic or configurable
+const featuredPhoto = {
+  filename: 'hero-photo.jpg',
+};
+
+const title = 'imnotyourson';
+const description = 'It was me, I let the dogs out.';
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout title={title} description={description}>
+  <Header />
+
+  <main class="homepage">
+    <div class="hero">
+      <div class="hero-image">
+        <img
+          src={getImageUrl(featuredPhoto.filename, { width: 1920 })}
+          srcset={getImageSrcset(featuredPhoto.filename)}
+          sizes={getImageSizes()}
+          alt={featuredPhoto.alt}
+          loading="eager"
+        />
+      </div>
+      <div class="hero-content">
+        <a href="/series" class="hero-cta">View Series</a>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .homepage {
+    min-height: calc(100vh - 80px);
+  }
+
+  .hero {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 80px);
+    min-height: 600px;
+    overflow: hidden;
+  }
+
+  .hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .hero-content {
+    position: absolute;
+    bottom: 4rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-description {
+    font-size: 1.25rem;
+    margin: 0 0 2rem 0;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .hero-cta {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--color-text);
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+  }
+
+  .hero-cta:hover {
+    background-color: white;
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      height: calc(100vh - 60px);
+      min-height: 500px;
+    }
+
+    .hero-content {
+      bottom: 2rem;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-description {
+      font-size: 1rem;
+    }
+  }
+</style>

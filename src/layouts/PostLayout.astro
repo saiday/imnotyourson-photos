@@ -1,0 +1,93 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+
+export interface Props {
+  title: string;
+  description: string;
+  created_at: Date;
+  featured_photo?: string;
+}
+
+const { title, description, created_at, featured_photo } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} image={featured_photo} type="article">
+  <Header />
+
+  <article class="post">
+    <div class="container">
+      <header class="post-header">
+        <h1 class="post-title">{title}</h1>
+        <time class="post-date" datetime={created_at.toISOString()}>
+          {created_at.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}
+        </time>
+        <p class="post-description">{description}</p>
+      </header>
+
+      <div class="post-content">
+        <slot />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post {
+    padding: 3rem 0 4rem;
+    min-height: calc(100vh - 80px);
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .post-header {
+    max-width: 800px;
+    margin: 0 auto 3rem;
+    text-align: center;
+  }
+
+  .post-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .post-date {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .post-description {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .post-content {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 768px) {
+    .post-title {
+      font-size: 2rem;
+    }
+
+    .post-description {
+      font-size: 1rem;
+    }
+  }
+</style>

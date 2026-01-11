@@ -1,0 +1,113 @@
+---
+import { getImageUrl, getImageSrcset, getImageSizes, RESPONSIVE_WIDTHS } from '../utils/images';
+
+export interface Photo {
+  filename: string;
+  alt: string;
+}
+
+interface Props {
+  photos: Photo[];
+}
+
+const { photos } = Astro.props;
+---
+
+<div class="photo-grid" data-fancybox-gallery>
+  {photos.map((photo) => (
+    <a
+      href={getImageUrl(photo.filename, { width: RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1] })}
+      data-fancybox="gallery"
+      data-caption={photo.alt}
+      class="photo-item"
+    >
+      <img
+        src={getImageUrl(photo.filename, { width: 960 })}
+        srcset={getImageSrcset(photo.filename)}
+        sizes={getImageSizes()}
+        alt={photo.alt}
+        loading="lazy"
+      />
+    </a>
+  ))}
+</div>
+
+<script>
+  import { Fancybox } from '@fancyapps/ui';
+  import '@fancyapps/ui/dist/fancybox/fancybox.css';
+
+  // Initialize Fancybox
+  Fancybox.bind('[data-fancybox="gallery"]', {
+    Toolbar: {
+      display: {
+        left: [],
+        middle: [],
+        right: ['close'],
+      },
+    },
+    Thumbs: false,
+    keyboard: {
+      Escape: 'close',
+      Delete: 'close',
+      Backspace: 'close',
+      PageUp: 'next',
+      PageDown: 'prev',
+      ArrowUp: 'prev',
+      ArrowDown: 'next',
+      ArrowRight: 'next',
+      ArrowLeft: 'prev',
+    },
+  });
+</script>
+
+<style>
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .photo-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    background-color: var(--color-border);
+  }
+
+  .photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    display: block;
+  }
+
+  .photo-item:hover img {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .photo-grid {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .photo-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .photo-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+  }
+</style>

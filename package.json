@@ -12,6 +12,7 @@
 	},
 	"dependencies": {
 		"@astrojs/cloudflare": "^12.6.12",
+		"@fancyapps/ui": "^6.1.7",
 		"astro": "^5.16.8"
 	},
 	"devDependencies": {

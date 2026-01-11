@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import PhotoGrid from '../../components/PhotoGrid.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const { title, description, created_at, photos, featured_photo } = post.data;
+---
+
+<PostLayout
+  title={title}
+  description={description}
+  created_at={created_at}
+  featured_photo={featured_photo}
+>
+  <!-- Post body content (if any markdown content exists) -->
+  <div class="prose">
+    <Content />
+  </div>
+
+  <!-- Photo grid -->
+  <PhotoGrid photos={photos} />
+</PostLayout>
+
+<style>
+  .prose {
+    max-width: 800px;
+    margin: 0 auto 3rem;
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--color-text);
+  }
+
+  .prose :global(p) {
+    margin: 1.5rem 0;
+  }
+
+  .prose :global(h2) {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 2.5rem 0 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .prose :global(h3) {
+    font-size: 1.375rem;
+    font-weight: 600;
+    margin: 2rem 0 0.75rem;
+  }
+
+  .prose :global(a) {
+    color: var(--color-text);
+    text-decoration: underline;
+  }
+
+  .prose :global(a:hover) {
+    opacity: 0.7;
+  }
+
+  @media (max-width: 768px) {
+    .prose {
+      font-size: 1rem;
+    }
+  }
+</style>
