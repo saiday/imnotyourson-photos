@@ -28,7 +28,7 @@ export function getImageUrl(filename: string, options: TransformOptions = {}): s
   const {
     width,
     format = 'auto',
-    quality = 100,
+    quality = 85, // Default for thumbnails, grid, carousel
     fit = 'scale-down',
   } = options;
 

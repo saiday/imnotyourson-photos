@@ -16,14 +16,14 @@ const { photos } = Astro.props;
 <div class="photo-grid" data-fancybox-gallery>
   {photos.map((photo) => (
     <a
-      href={getImageUrl(photo.filename, { width: RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1] })}
+      href={getImageUrl(photo.filename, { width: RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1], quality: 100 })}
       data-fancybox="gallery"
       class="photo-item"
     >
       <img
         src={getImageUrl(photo.filename, { width: 960 })}
-        srcset={getImageSrcset(photo.filename)}
-        sizes={getImageSizes()}
+        srcset={`${getImageUrl(photo.filename, { width: 960 })} 960w`}
+        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
         loading="lazy"
       />
     </a>
@@ -34,16 +34,23 @@ const { photos } = Astro.props;
   import { Fancybox } from '@fancyapps/ui';
   import '@fancyapps/ui/dist/fancybox/fancybox.css';
 
-  // Initialize Fancybox
+  // Initialize Fancybox with minimal UI
   Fancybox.bind('[data-fancybox="gallery"]', {
-    Toolbar: {
-      display: {
-        left: [],
-        middle: [],
-        right: ['close'],
-      },
-    },
+    // Remove all toolbar elements
+    Toolbar: false,
+    closeButton: false,
+
+    // Disable thumbnails
     Thumbs: false,
+
+    // Fade animation
+    showClass: 'f-fadeIn',
+    hideClass: 'f-fadeOut',
+
+    // Close on background click
+    backdropClick: 'close',
+
+    // Keyboard navigation
     keyboard: {
       Escape: 'close',
       Delete: 'close',
@@ -55,6 +62,13 @@ const { photos } = Astro.props;
       ArrowRight: 'next',
       ArrowLeft: 'prev',
     },
+
+    // Image settings
+    Image: {
+      zoom: false,
+    },
+
+    animated: true,
   });
 </script>
 
@@ -64,6 +78,7 @@ const { photos } = Astro.props;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1rem;
     margin: 2rem 0;
+    grid-auto-rows: auto; /* Allow rows to size naturally */
   }
 
   .photo-item {
@@ -77,14 +92,14 @@ const { photos } = Astro.props;
 
   .photo-item img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto; /* Changed from 100% to preserve aspect ratio */
+    object-fit: contain; /* Changed from cover to respect aspect ratios */
     transition: transform 0.3s ease, opacity 0.3s ease;
     display: block;
   }
 
   .photo-item:hover img {
-    transform: scale(1.05);
+    transform: scale(1.02); /* Reduced from 1.05 for subtlety */
     opacity: 0.9;
   }
 
@@ -107,5 +122,33 @@ const { photos } = Astro.props;
       grid-template-columns: repeat(3, 1fr);
       gap: 1.25rem;
     }
+  }
+
+  /* Fancybox dark theme customization */
+  :global(.fancybox__backdrop) {
+    background-color: rgba(0, 0, 0, 0.95);
+  }
+
+  :global(.fancybox__slide) {
+    padding: 2rem;
+  }
+
+  /* Fade transitions */
+  :global(.f-fadeIn) {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  :global(.f-fadeOut) {
+    animation: fadeOut 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 </style>
