@@ -55,20 +55,8 @@ Use custom domain for R2 origin (not `r2.dev` URLs) to enable:
 
 ### Creating New Posts
 
-```bash
-npm run create-post
-```
-
-Interactive script that:
-1. Prompts for metadata (title, slug, description, images directory suffix, show in homepage)
-2. Collects images from a directory path
-   - Lists all images in the directory alphabetically
-   - Allows custom ordering via comma-separated indices (e.g., "1,3,2,5,4")
-   - Preserves original filenames (sanitized: lowercase, hyphens for spaces)
-   - Extracts image dimensions (width/height) using sharp
-   - Handles duplicate filenames with numeric suffixes (-2, -3, etc.)
-3. Uploads to R2 as `{suffix}/{sanitized-filename}.jpg`
-4. Creates `src/content/posts/{slug}.md` with frontmatter including dimensions
-5. Commits and pushes to git
-
-Example: `vacation-photo.JPG` → uploads as `summer-2024/vacation-photo.jpg` with width/height in frontmatter
+Run `npm run create-post`:
+- Prompts for metadata (title, slug, description, images directory, suffix)
+- Reads images from directory, preserves filenames (sanitized)
+- Extracts dimensions, uploads to R2 as `{suffix}/{filename}.jpg`
+- Generates markdown with frontmatter, commits and pushes
