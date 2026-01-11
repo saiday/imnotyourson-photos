@@ -122,7 +122,7 @@ async function collectImages(suffix) {
 
       keepAdding = await confirm({
         message: 'Add another image?',
-        default: false
+        default: true
       });
     } catch (error) {
       console.error(chalk.red(`✗ ${error.message}`));
