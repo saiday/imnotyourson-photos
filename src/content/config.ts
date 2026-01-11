@@ -9,7 +9,7 @@ const postsCollection = defineCollection({
     created_at: z.date(),
     photos: z.array(z.object({
       filename: z.string(),
-      alt: z.string(),
+      alt: z.string().optional(),
     })),
     featured_photo: z.string().optional(),
   }),

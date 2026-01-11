@@ -39,8 +39,8 @@ Images are stored in Cloudflare R2 and delivered via Cloudflare Image Transforma
 
 ### Homepage IA
 - Homepage displays a single main photo
-- Site has "series" menu that presents a blog index (reverse chronological).
-- Posts are the primary navigation unit; optional tags/series later.
+- Site has "archive" menu that presents a minimalist blog index (reverse chronological, titles only)
+- Posts are the primary navigation unit; optional tags later
 
 ### Gallery layout and viewer
 - Posts use **Astro Photo Grid** as the preferred gallery/viewer library.
@@ -80,5 +80,7 @@ Images are stored in Cloudflare R2 and delivered via Cloudflare Image Transforma
 - **Domain**: photos.imnotyourson.com
 - **Photo captions**: NOT required (v1)
 - **EXIF metadata display**: NOT required (v1)
-- **Frontmatter schema**: title, description, slug, public (boolean), created_at (date)
+- **Alt text on images**: NOT required (user prefers minimalism, alt is optional)
+- **Frontmatter schema**: title, description, public (boolean), created_at (date), photos (array), featured_photo (optional)
+- **Archive page**: Minimalist title list only (no thumbnails, no descriptions)
 

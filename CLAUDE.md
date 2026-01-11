@@ -8,6 +8,13 @@ Context for AI assistants working on this project.
 - **Development Plan for agents**: `dev_docs/development_plan.md`
 - **Tech stack decisions and quotas**: `dev_docs/site_tech_decision.md`
 
+## User Preferences
+
+### Design Philosophy
+- **Minimalism**: Keep layouts clean and simple, avoid unnecessary elements
+- **No alt text**: Images should not have alt attributes (user preference)
+- **Lowercase naming**: Use lowercase for navigation labels (e.g., "archive" not "Archive")
+
 ## Critical Rules
 
 ### 1. NO Build-Time Image Optimization

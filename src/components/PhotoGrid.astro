@@ -3,7 +3,7 @@ import { getImageUrl, getImageSrcset, getImageSizes, RESPONSIVE_WIDTHS } from '.
 
 export interface Photo {
   filename: string;
-  alt: string;
+  alt?: string;
 }
 
 interface Props {
@@ -18,14 +18,12 @@ const { photos } = Astro.props;
     <a
       href={getImageUrl(photo.filename, { width: RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1] })}
       data-fancybox="gallery"
-      data-caption={photo.alt}
       class="photo-item"
     >
       <img
         src={getImageUrl(photo.filename, { width: 960 })}
         srcset={getImageSrcset(photo.filename)}
         sizes={getImageSizes()}
-        alt={photo.alt}
         loading="lazy"
       />
     </a>

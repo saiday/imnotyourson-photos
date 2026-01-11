@@ -1,0 +1,85 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+
+// Get all posts, filter public ones, and sort by date (newest first)
+const allPosts = await getCollection('posts');
+const publicPosts = allPosts
+  .filter(post => post.data.public)
+  .sort((a, b) => b.data.created_at.getTime() - a.data.created_at.getTime());
+
+const title = 'archive';
+const description = 'A chronological collection of photo essays.';
+---
+
+<BaseLayout title={title} description={description}>
+  <Header />
+
+  <main class="archive-index">
+    <div class="container">
+      <ul class="posts-list">
+        {publicPosts.map((post) => (
+          <li>
+            <a href={`/posts/${post.slug}`}>
+              {post.data.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      {publicPosts.length === 0 && (
+        <p class="empty-state">No posts yet.</p>
+      )}
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .archive-index {
+    padding: 3rem 0 4rem;
+    min-height: calc(100vh - 80px);
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .posts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .posts-list li {
+    margin-bottom: 1rem;
+  }
+
+  .posts-list a {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    display: block;
+    transition: opacity 0.2s ease;
+  }
+
+  .posts-list a:hover {
+    opacity: 0.6;
+    text-decoration: none;
+  }
+
+  .empty-state {
+    color: var(--color-text-muted);
+    padding: 4rem 0;
+    font-size: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .posts-list a {
+      font-size: 1rem;
+    }
+  }
+</style>
