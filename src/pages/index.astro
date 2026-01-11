@@ -16,6 +16,7 @@ const publicPosts = allPosts
 const featuredPhotos = publicPosts.map(post => ({
   filename: post.data.featured_photo!,
   slug: post.slug,
+  title: post.data.title,
 }));
 
 const title = 'imnotyourson';
@@ -29,19 +30,24 @@ const description = 'It was me, I let the dogs out.';
     <div class="hero">
       <div class="hero-images">
         {featuredPhotos.slice(0, 3).map((photo, index) => (
-          <a href={`/${photo.slug}`} class="hero-image-link">
-            <img
-              src={getImageUrl(photo.filename, { width: 1920 })}
-              srcset={getImageSrcset(photo.filename)}
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              loading={index === 0 ? 'eager' : 'lazy'}
-              alt=""
-            />
-          </a>
+          <div class="hero-item">
+            <div class="hero-image-wrapper">
+              <img
+                src={getImageUrl(photo.filename, { width: 1920 })}
+                srcset={getImageSrcset(photo.filename)}
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                loading={index === 0 ? 'eager' : 'lazy'}
+                alt=""
+              />
+            </div>
+            <a href={`/${photo.slug}`} class="hero-title">
+              {photo.title}
+            </a>
+          </div>
         ))}
       </div>
       <div class="hero-content">
-        <a href="/archive" class="hero-cta">View archive</a>
+        <a href="/archive" class="hero-cta">view archive</a>
       </div>
     </div>
   </main>
@@ -52,8 +58,8 @@ const description = 'It was me, I let the dogs out.';
   .homepage {
     min-height: 100vh;
     display: flex;
-    align-items: center;
-    padding: 40px 40px;
+    align-items: flex-start;
+    padding: 80px 40px 40px 40px;
   }
 
   .hero {
@@ -67,41 +73,49 @@ const description = 'It was me, I let the dogs out.';
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
-    border-radius: 8px;
-    overflow: hidden;
+    align-items: start;
   }
 
-  .hero-image-link {
+  .hero-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero-image-wrapper {
     position: relative;
     display: block;
     aspect-ratio: 5 / 3;
     overflow: hidden;
     background-color: var(--color-border);
+    border-radius: 8px;
   }
 
-  .hero-image-link img {
+  .hero-image-wrapper img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transition: transform 0.3s ease, opacity 0.3s ease;
   }
 
-  .hero-image-link:hover img {
-    transform: scale(1.05);
-    opacity: 0.9;
+  .hero-title {
+    display: block;
+    margin-top: 0.75rem;
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    transition: opacity 0.2s ease;
+  }
+
+  .hero-title:hover {
+    opacity: 0.6;
+    text-decoration: none;
   }
 
   .hero-content {
-    position: absolute;
-    bottom: 1.25rem;
-    left: 0;
-    right: 0;
+    margin-top: 2rem;
     text-align: center;
     color: white;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    z-index: 10;
-    pointer-events: none;
   }
 
   .hero-cta {
@@ -113,10 +127,8 @@ const description = 'It was me, I let the dogs out.';
     font-weight: 500;
     font-size: 0.875rem;
     letter-spacing: 0.1em;
-    text-transform: uppercase;
     position: relative;
     transition: opacity 0.2s ease;
-    pointer-events: auto;
   }
 
   /* Animated underline on hover */
@@ -149,7 +161,7 @@ const description = 'It was me, I let the dogs out.';
       grid-template-columns: repeat(2, 1fr);
     }
 
-    .hero-image-link:last-child {
+    .hero-item:last-child {
       display: none;
     }
   }
@@ -157,7 +169,7 @@ const description = 'It was me, I let the dogs out.';
   /* Mobile: 1 image */
   @media (max-width: 768px) {
     .homepage {
-      padding: 20px 20px;
+      padding: 40px 20px 20px 20px;
     }
 
     .hero-images {
@@ -165,16 +177,20 @@ const description = 'It was me, I let the dogs out.';
       gap: 0.75rem;
     }
 
-    .hero-image-link {
+    .hero-image-wrapper {
       aspect-ratio: 4 / 3;
     }
 
-    .hero-image-link:nth-child(n+2) {
+    .hero-item:nth-child(n+2) {
       display: none;
     }
 
+    .hero-title {
+      font-size: 1rem;
+    }
+
     .hero-content {
-      bottom: 1rem;
+      margin-top: 1.5rem;
     }
   }
 </style>
