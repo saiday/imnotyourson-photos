@@ -2,7 +2,7 @@
 title: "Prague, Český Krumlov and Berlin in Color"
 description: "The ginkgos at Český Krumlov Castle were in full bloom when I first visited. Overnight, a cold night, they emptied themselves. I’ll remember those emotions for life.\n"
 public: true
-created_at: "2026-01-11T16:10:51.907Z"
+created_at: 2026-01-11T16:10:51.907Z
 photos:
   - filename: "prague-krumlov-berlin-in-color/prague-hostal.jpg"
     width: 2045
