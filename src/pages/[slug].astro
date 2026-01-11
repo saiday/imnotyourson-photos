@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import PostLayout from '../layouts/PostLayout.astro';
 import PhotoGrid from '../components/PhotoGrid.astro';
 
@@ -7,13 +7,18 @@ export async function getStaticPaths() {
   const posts = await getCollection('posts');
   return posts.map((post) => ({
     params: { slug: post.slug },
-    props: { post },
   }));
 }
 
-const { post } = Astro.props;
-const { Content } = await post.render();
+// Fetch post data directly using the slug parameter
+const { slug } = Astro.params;
+const post = await getEntry('posts', slug);
 
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+const { Content } = await post.render();
 const { title, description, created_at, photos, featured_photo } = post.data;
 ---
 
