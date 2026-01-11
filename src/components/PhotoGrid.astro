@@ -74,53 +74,66 @@ const { photos } = Astro.props;
 
 <style>
   .photo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
+    column-count: 3;
+    column-gap: 1.25rem;
     margin: 2rem 0;
-    grid-auto-rows: auto; /* Allow rows to size naturally */
   }
 
   .photo-item {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 1.25rem;
+    break-inside: avoid;
     position: relative;
     overflow: hidden;
     border-radius: 4px;
     cursor: pointer;
-    display: block;
     background-color: var(--color-border);
   }
 
   .photo-item img {
     width: 100%;
-    height: auto; /* Changed from 100% to preserve aspect ratio */
-    object-fit: contain; /* Changed from cover to respect aspect ratios */
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    height: auto;
     display: block;
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
 
   .photo-item:hover img {
-    transform: scale(1.02); /* Reduced from 1.05 for subtlety */
+    transform: scale(1.02);
     opacity: 0.9;
   }
 
-  /* Responsive adjustments */
+  /* Responsive column adjustments */
   @media (max-width: 768px) {
     .photo-grid {
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
+      column-count: 1;
+      column-gap: 0.75rem;
+    }
+
+    .photo-item {
+      margin-bottom: 0.75rem;
     }
   }
 
   @media (min-width: 769px) and (max-width: 1024px) {
     .photo-grid {
-      grid-template-columns: repeat(2, 1fr);
+      column-count: 2;
+      column-gap: 1rem;
+    }
+
+    .photo-item {
+      margin-bottom: 1rem;
     }
   }
 
   @media (min-width: 1025px) {
     .photo-grid {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.25rem;
+      column-count: 3;
+      column-gap: 1.25rem;
+    }
+
+    .photo-item {
+      margin-bottom: 1.25rem;
     }
   }
 

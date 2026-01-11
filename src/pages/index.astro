@@ -24,16 +24,17 @@ const description = 'It was me, I let the dogs out.';
 
   <main class="homepage">
     <div class="hero">
-      <div class="carousel">
-        {featuredPhotos.map((photo, index) => (
-          <div class="carousel-slide" data-slide={index}>
+      <div class="hero-images">
+        {featuredPhotos.slice(0, 3).map((photo, index) => (
+          <a href={`/${photo.slug}`} class="hero-image-link">
             <img
               src={getImageUrl(photo.filename, { width: 1920 })}
               srcset={getImageSrcset(photo.filename)}
-              sizes={getImageSizes()}
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               loading={index === 0 ? 'eager' : 'lazy'}
+              alt=""
             />
-          </div>
+          </a>
         ))}
       </div>
       <div class="hero-content">
@@ -43,91 +44,67 @@ const description = 'It was me, I let the dogs out.';
   </main>
 </BaseLayout>
 
-<script>
-  let currentSlide = 0;
-  const slides = document.querySelectorAll('.carousel-slide') as NodeListOf<HTMLElement>;
-  const totalSlides = slides.length;
-
-  if (totalSlides > 1) {
-    // Show first slide
-    slides[0].classList.add('active');
-
-    // Auto-advance carousel every 5 seconds
-    setInterval(() => {
-      slides[currentSlide].classList.remove('active');
-      currentSlide = (currentSlide + 1) % totalSlides;
-      slides[currentSlide].classList.add('active');
-    }, 5000);
-  } else if (totalSlides === 1) {
-    // Only one slide, just show it
-    slides[0].classList.add('active');
-  }
-</script>
 
 <style>
   .homepage {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    padding: 150px 40px; /* Add vertical + horizontal padding */
+    padding: 40px 40px;
   }
 
   .hero {
     position: relative;
     width: 100%;
-    max-width: 1600px; /* Constrain maximum width */
+    max-width: 1600px;
     margin: 0 auto;
-    aspect-ratio: 3 / 2; /* Maintain consistent aspect ratio */
+  }
+
+  .hero-images {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    border-radius: 8px;
     overflow: hidden;
-    border-radius: 8px; /* Subtle rounding for framed look */
   }
 
-  .carousel {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  .hero-image-link {
+    position: relative;
+    display: block;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background-color: var(--color-border);
   }
 
-  .carousel-slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-    pointer-events: none;
-  }
-
-  .carousel-slide.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .carousel-slide img {
+  .hero-image-link img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .hero-image-link:hover img {
+    transform: scale(1.05);
+    opacity: 0.9;
   }
 
   .hero-content {
     position: absolute;
-    bottom: 2rem; /* Adjusted from 4rem */
+    bottom: 2rem;
     left: 0;
     right: 0;
     text-align: center;
     color: white;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     z-index: 10;
+    pointer-events: none;
   }
 
   .hero-cta {
     display: inline-block;
     padding: 0.5rem 0;
-    background-color: transparent; /* Removed white background */
+    background-color: transparent;
     color: white;
     text-decoration: none;
     font-weight: 500;
@@ -136,6 +113,7 @@ const description = 'It was me, I let the dogs out.';
     text-transform: uppercase;
     position: relative;
     transition: opacity 0.2s ease;
+    pointer-events: auto;
   }
 
   /* Animated underline on hover */
@@ -162,13 +140,34 @@ const description = 'It was me, I let the dogs out.';
     transform-origin: left;
   }
 
-  @media (max-width: 768px) {
-    .homepage {
-      padding: 80px 20px; /* Reduced padding on mobile */
+  /* Tablet: 2 images */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .hero-images {
+      grid-template-columns: repeat(2, 1fr);
     }
 
-    .hero {
-      aspect-ratio: 4 / 3; /* Taller ratio for mobile */
+    .hero-image-link:last-child {
+      display: none;
+    }
+  }
+
+  /* Mobile: 1 image */
+  @media (max-width: 768px) {
+    .homepage {
+      padding: 20px 20px;
+    }
+
+    .hero-images {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .hero-image-link {
+      aspect-ratio: 4 / 3;
+    }
+
+    .hero-image-link:nth-child(n+2) {
+      display: none;
     }
 
     .hero-content {
