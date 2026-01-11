@@ -16,9 +16,10 @@ const { photos } = Astro.props;
 <div class="photo-grid" data-fancybox-gallery>
   {photos.map((photo) => (
     <a
+      style={photo.width && photo.height ? `--width: ${photo.width}; --height: ${photo.height};` : undefined}
       href={getImageUrl(photo.filename, { width: RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1], quality: 100 })}
       data-fancybox="gallery"
-      class="photo-item"
+      class={photo.width && photo.height ? "photo-item" : "photo-item photo-item-fallback"}
     >
       <img
         src={getImageUrl(photo.filename, { width: 960 })}
@@ -74,14 +75,17 @@ const { photos } = Astro.props;
 
 <style>
   .photo-grid {
+    --min-height: clamp(200px, 20vw, 400px);
     display: flex;
     flex-wrap: wrap;
-    gap: 1.25rem;
+    gap: max(1.5vw, 12px);
     margin: 2rem 0;
   }
 
   .photo-item {
-    flex: 1 1 300px;
+    flex-grow: calc(var(--width) * (100000 / var(--height)));
+    flex-basis: calc(var(--min-height) * (var(--width) / var(--height)));
+    aspect-ratio: var(--width) / var(--height);
     position: relative;
     overflow: hidden;
     border-radius: 4px;
@@ -91,7 +95,8 @@ const { photos } = Astro.props;
 
   .photo-item img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
     display: block;
     transition: transform 0.3s ease, opacity 0.3s ease;
   }
@@ -101,34 +106,35 @@ const { photos } = Astro.props;
     opacity: 0.9;
   }
 
+  /* Fallback for photos without dimensions */
+  .photo-item-fallback {
+    flex: 1 1 300px;
+    aspect-ratio: auto;
+  }
+
+  .photo-item-fallback img {
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Force last row to justify left */
+  .photo-grid::after {
+    content: "";
+    flex-grow: 1000000000;
+  }
+
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .photo-grid {
+      --min-height: clamp(150px, 30vw, 300px);
       gap: 0.75rem;
-    }
-
-    .photo-item {
-      flex: 1 1 100%;
     }
   }
 
   @media (min-width: 769px) and (max-width: 1024px) {
     .photo-grid {
+      --min-height: clamp(180px, 25vw, 350px);
       gap: 1rem;
-    }
-
-    .photo-item {
-      flex: 1 1 calc(50% - 0.5rem);
-    }
-  }
-
-  @media (min-width: 1025px) {
-    .photo-grid {
-      gap: 1.25rem;
-    }
-
-    .photo-item {
-      flex: 1 1 calc(33.333% - 1rem);
     }
   }
 
