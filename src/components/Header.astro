@@ -1,15 +1,9 @@
 ---
-const currentPath = Astro.url.pathname;
 ---
 
 <header class="site-header">
   <div class="container">
     <a href="/" class="site-title">imnotyourson</a>
-    <nav class="site-nav">
-      <a href="/archive" class:list={['nav-link', { active: currentPath.startsWith('/archive') }]}>
-        archive
-      </a>
-    </nav>
   </div>
 </header>
 

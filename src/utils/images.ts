@@ -28,7 +28,7 @@ export function getImageUrl(filename: string, options: TransformOptions = {}): s
   const {
     width,
     format = 'auto',
-    quality = 85,
+    quality = 100,
     fit = 'scale-down',
   } = options;
 

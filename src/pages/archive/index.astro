@@ -21,7 +21,7 @@ const description = 'A chronological collection of photo essays.';
       <ul class="posts-list">
         {publicPosts.map((post) => (
           <li>
-            <a href={`/posts/${post.slug}`}>
+            <a href={`/${post.slug}`}>
               {post.data.title}
             </a>
           </li>
