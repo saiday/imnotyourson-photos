@@ -84,3 +84,17 @@ Images are stored in Cloudflare R2 and delivered via Cloudflare Image Transforma
 - **Frontmatter schema**: title, description, public (boolean), created_at (date), photos (array), featured_photo (optional)
 - **Archive page**: Minimalist title list only (no thumbnails, no descriptions)
 
+## 9) Content Creation Workflow
+
+**Creating posts:** Run `npm run create-post`
+- Interactive prompts for title, slug, description, images directory path, show in homepage
+- Directory-based image collection:
+  - Reads all images from specified directory
+  - Displays numbered list, allows custom ordering via indices
+  - Preserves original filenames (sanitized to web-safe format)
+  - Extracts image dimensions (width/height) for justified gallery layout
+  - Handles duplicate filenames with automatic numeric suffixes
+- Uploads to R2 with semantic filenames (e.g., `vacation-beach.jpg` not `001.jpg`)
+- Generates markdown with frontmatter including width/height for each photo
+- Commits and pushes to git automatically
+

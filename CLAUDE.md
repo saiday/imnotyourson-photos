@@ -50,3 +50,25 @@ Use custom domain for R2 origin (not `r2.dev` URLs) to enable:
 - **Content**: Markdown/MDX, Git-based
 - **Performance target**: Lighthouse ≥ 90, LCP < 2.5s
 - **Dev testing**: browser-use MCP available for visual testing on localhost:4321
+
+## Workflows
+
+### Creating New Posts
+
+```bash
+npm run create-post
+```
+
+Interactive script that:
+1. Prompts for metadata (title, slug, description, images directory suffix, show in homepage)
+2. Collects images from a directory path
+   - Lists all images in the directory alphabetically
+   - Allows custom ordering via comma-separated indices (e.g., "1,3,2,5,4")
+   - Preserves original filenames (sanitized: lowercase, hyphens for spaces)
+   - Extracts image dimensions (width/height) using sharp
+   - Handles duplicate filenames with numeric suffixes (-2, -3, etc.)
+3. Uploads to R2 as `{suffix}/{sanitized-filename}.jpg`
+4. Creates `src/content/posts/{slug}.md` with frontmatter including dimensions
+5. Commits and pushes to git
+
+Example: `vacation-photo.JPG` → uploads as `summer-2024/vacation-photo.jpg` with width/height in frontmatter
