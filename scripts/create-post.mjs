@@ -323,7 +323,7 @@ function generateMarkdown(title, description, photos, featuredPhoto, showInHomep
     title,
     description,
     public: true,
-    created_at: new Date().toISOString(),
+    created_at: new Date(),
     photos: photos.map(photo => ({
       filename: photo.r2Path,
       width: photo.width,
