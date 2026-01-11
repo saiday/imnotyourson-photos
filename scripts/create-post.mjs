@@ -41,6 +41,23 @@ function validateSlug(value) {
   return true;
 }
 
+function sanitizeFilename(filename) {
+  // Extract name and extension
+  const ext = path.extname(filename).toLowerCase();
+  const name = path.basename(filename, ext);
+
+  // Sanitize: lowercase, replace spaces/underscores with hyphens, remove special chars
+  const sanitized = name
+    .toLowerCase()
+    .replace(/[\s_]+/g, '-')           // spaces and underscores → hyphens
+    .replace(/[^a-z0-9-]/g, '')        // remove anything not alphanumeric or hyphen
+    .replace(/-+/g, '-')               // collapse multiple hyphens
+    .replace(/^-|-$/g, '');            // trim leading/trailing hyphens
+
+  // Always use .jpg extension for consistency
+  return `${sanitized}.jpg`;
+}
+
 async function cleanupTempDir() {
   if (tempDir) {
     try {
@@ -52,6 +69,83 @@ async function cleanupTempDir() {
 }
 
 // ===== IMAGE COLLECTION =====
+
+async function readImagesFromDirectory(dirPath) {
+  // Expand home directory
+  const expandedPath = dirPath.replace(/^~/, process.env.HOME);
+
+  // Read directory
+  const files = await fs.readdir(expandedPath, { withFileTypes: true });
+
+  // Filter for image files only
+  const imageFiles = [];
+  for (const file of files) {
+    if (!file.isFile()) continue;
+
+    const ext = path.extname(file.name).toLowerCase();
+    if (!['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) continue;
+
+    imageFiles.push({
+      originalName: file.name,
+      fullPath: path.join(expandedPath, file.name)
+    });
+  }
+
+  // Sort alphabetically for consistent display
+  imageFiles.sort((a, b) => a.originalName.localeCompare(b.originalName));
+
+  return imageFiles;
+}
+
+async function promptImageOrder(imageFiles) {
+  console.log(chalk.cyan('\nFound Images:\n'));
+
+  // Display numbered list
+  imageFiles.forEach((file, index) => {
+    console.log(chalk.gray(`  ${index + 1}. ${file.originalName}`));
+  });
+
+  console.log(chalk.gray('\nEnter the order you want (e.g., "1,3,2" or "3,1,2,5,4")'));
+  console.log(chalk.gray('Leave blank to use current order\n'));
+
+  const orderInput = await input({
+    message: 'Image order:',
+    default: '',
+    validate: (value) => {
+      if (value.trim() === '') return true; // Allow empty for default order
+
+      const indices = value.split(',').map(s => s.trim());
+      const nums = indices.map(s => parseInt(s, 10));
+
+      // Check all are valid numbers
+      if (nums.some(n => isNaN(n))) {
+        return 'All values must be numbers separated by commas';
+      }
+
+      // Check all are in valid range
+      if (nums.some(n => n < 1 || n > imageFiles.length)) {
+        return `Numbers must be between 1 and ${imageFiles.length}`;
+      }
+
+      // Check for duplicates
+      const uniqueNums = new Set(nums);
+      if (uniqueNums.size !== nums.length) {
+        return 'Duplicate numbers not allowed';
+      }
+
+      return true;
+    }
+  });
+
+  // If empty, use default order
+  if (orderInput.trim() === '') {
+    return imageFiles;
+  }
+
+  // Reorder based on input
+  const indices = orderInput.split(',').map(s => parseInt(s.trim(), 10) - 1);
+  return indices.map(i => imageFiles[i]);
+}
 
 async function readImageFromPath(imagePath) {
   // Expand home directory if needed
@@ -86,54 +180,92 @@ async function collectImages(suffix) {
   await fs.mkdir(tempDir, { recursive: true });
 
   console.log(chalk.cyan('\nImage Collection'));
-  console.log(chalk.gray('Paste image file path and press Enter.\n'));
+  console.log(chalk.gray('Provide a directory path containing your images.\n'));
 
-  let keepAdding = true;
-  let index = 1;
+  // Get directory path
+  const dirPath = await input({
+    message: 'Image directory path:',
+    validate: async (value) => {
+      if (value.trim() === '') return 'Path cannot be empty';
 
-  while (keepAdding) {
-    console.log(chalk.blue(`\nImage ${index}:`));
+      try {
+        const expandedPath = value.replace(/^~/, process.env.HOME);
+        const stats = await fs.stat(expandedPath);
+        if (!stats.isDirectory()) {
+          return 'Path must be a directory';
+        }
+        return true;
+      } catch (error) {
+        return `Invalid path: ${error.message}`;
+      }
+    }
+  });
 
-    const imagePath = await input({
-      message: 'Image path:',
-      validate: (value) => value.trim() !== '' || 'Path cannot be empty'
-    });
+  // Read and display images from directory
+  const imageFiles = await readImagesFromDirectory(dirPath.trim());
+
+  if (imageFiles.length === 0) {
+    throw new Error('No image files found in directory');
+  }
+
+  // Let user order the images
+  const orderedFiles = await promptImageOrder(imageFiles);
+
+  console.log(chalk.cyan(`\nProcessing ${orderedFiles.length} image(s)...\n`));
+
+  // Track used filenames to handle duplicates
+  const usedFilenames = new Set();
+
+  // Process each image
+  for (let index = 0; index < orderedFiles.length; index++) {
+    const file = orderedFiles[index];
 
     try {
-      const { buffer, ext, mime, originalPath, width, height } = await readImageFromPath(imagePath.trim());
+      const { buffer, ext, mime, originalPath, width, height } = await readImageFromPath(file.fullPath);
 
-      // Save to temp directory
-      const filename = `${String(index).padStart(3, '0')}.jpg`;
-      const tempPath = path.join(tempDir, filename);
+      // Sanitize original filename
+      const sanitizedFilename = sanitizeFilename(file.originalName);
+
+      // Handle duplicate filenames
+      let finalFilename = sanitizedFilename;
+      let counter = 2;
+      while (usedFilenames.has(finalFilename)) {
+        const name = path.basename(sanitizedFilename, '.jpg');
+        finalFilename = `${name}-${counter}.jpg`;
+        counter++;
+      }
+      usedFilenames.add(finalFilename);
+
+      const tempPath = path.join(tempDir, finalFilename);
       await fs.writeFile(tempPath, buffer);
 
       // Track for upload
       images.push({
         localPath: tempPath,
-        r2Path: `${suffix}/${filename}`,
+        r2Path: `${suffix}/${finalFilename}`,
         size: buffer.length,
         width,
         height
       });
 
-      console.log(chalk.green(`✓ Image ${index} (${mime}, ${formatBytes(buffer.length)}, ${width}×${height})`));
-      console.log(chalk.gray(`  Source: ${originalPath}`));
-      index++;
-
-      keepAdding = await confirm({
-        message: 'Add another image?',
-        default: true
-      });
+      console.log(chalk.green(`✓ Image ${index + 1}/${orderedFiles.length}: ${finalFilename} (${mime}, ${formatBytes(buffer.length)}, ${width}×${height})`));
+      console.log(chalk.gray(`  Source: ${file.originalName}`));
     } catch (error) {
-      console.error(chalk.red(`✗ ${error.message}`));
-      const retry = await confirm({
-        message: 'Try again?',
+      console.error(chalk.red(`✗ Failed to process ${file.originalName}: ${error.message}`));
+
+      const continueProcessing = await confirm({
+        message: 'Continue with remaining images?',
         default: true
       });
-      if (!retry) {
-        keepAdding = false;
+
+      if (!continueProcessing) {
+        throw new Error('Image processing cancelled');
       }
     }
+  }
+
+  if (images.length === 0) {
+    throw new Error('No images were successfully processed');
   }
 
   return images;
@@ -314,7 +446,7 @@ async function main() {
       default: true
     });
 
-    // Step 2: Collect images
+    // Step 2: Collect images from directory
     const images = await collectImages(imagesSuffix);
     if (images.length === 0) {
       throw new Error('No images added. At least one image is required.');
