@@ -46,9 +46,6 @@ photos:
   - filename: "prague-berlin-in-bw/berlin-street-3.jpg"
     width: 2931
     height: 4396
-  - filename: "prague-berlin-in-bw/berlin-humboldt.jpg"
-    width: 4583
-    height: 3055
   - filename: "prague-berlin-in-bw/berlin-construction-1.jpg"
     width: 3153
     height: 4730
