@@ -17,7 +17,7 @@ const { photos } = Astro.props;
   {photos.map((photo) => (
     <a
       style={photo.width && photo.height ? `--width: ${photo.width}; --height: ${photo.height};` : undefined}
-      href={getImageUrl(photo.filename, { width: RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1], quality: 100 })}
+      href={getImageUrl(photo.filename, { width: RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1], quality: 90 })}
       data-fancybox="gallery"
       class={photo.width && photo.height ? "photo-item" : "photo-item photo-item-fallback"}
     >
