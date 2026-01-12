@@ -19,13 +19,6 @@ const { title, description, created_at, featured_photo } = Astro.props;
     <div class="container">
       <header class="post-header">
         <h1 class="post-title">{title}</h1>
-        <time class="post-date" datetime={created_at.toISOString()}>
-          {created_at.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}
-        </time>
         <p class="post-description">{description}</p>
       </header>
 
@@ -60,13 +53,6 @@ const { title, description, created_at, featured_photo } = Astro.props;
     margin: 0 0 1rem 0;
     letter-spacing: -0.02em;
     line-height: 1.2;
-  }
-
-  .post-date {
-    display: block;
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
-    margin-bottom: 1rem;
   }
 
   .post-description {
