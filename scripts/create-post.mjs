@@ -211,6 +211,20 @@ async function collectImages(suffix) {
   // Let user order the images
   const orderedFiles = await promptImageOrder(imageFiles);
 
+  // Ask for featured photo selection
+  console.log(chalk.cyan('\nSelect Featured Photo:\n'));
+  const featuredIndex = await input({
+    message: `Featured photo (1-${orderedFiles.length}):`,
+    default: '1',
+    validate: (value) => {
+      const num = parseInt(value, 10);
+      if (isNaN(num) || num < 1 || num > orderedFiles.length) {
+        return `Must be between 1 and ${orderedFiles.length}`;
+      }
+      return true;
+    }
+  });
+
   console.log(chalk.cyan(`\nProcessing ${orderedFiles.length} image(s)...\n`));
 
   // Track used filenames to handle duplicates
@@ -268,7 +282,7 @@ async function collectImages(suffix) {
     throw new Error('No images were successfully processed');
   }
 
-  return images;
+  return { images, featuredIndex: parseInt(featuredIndex, 10) - 1 };
 }
 
 // ===== R2 UPLOAD =====
@@ -339,7 +353,7 @@ function generateMarkdown(title, description, photos, featuredPhoto, showInHomep
     forceQuotes: true
   });
 
-  return `---\n${yamlString}---\n\n${description}\n`;
+  return `---\n${yamlString}---\n`;
 }
 
 async function writePostFile(slug, markdown) {
@@ -447,7 +461,7 @@ async function main() {
     });
 
     // Step 2: Collect images from directory
-    const images = await collectImages(imagesSuffix);
+    const { images, featuredIndex } = await collectImages(imagesSuffix);
     if (images.length === 0) {
       throw new Error('No images added. At least one image is required.');
     }
@@ -468,7 +482,7 @@ async function main() {
 
     // Step 4: Generate markdown
     console.log(chalk.cyan('Generating post file...\n'));
-    const markdown = generateMarkdown(title, description, images, images[0].r2Path, showInHomepage);
+    const markdown = generateMarkdown(title, description, images, images[featuredIndex].r2Path, showInHomepage);
     const postPath = await writePostFile(slug, markdown);
 
     // Step 5: Git commit and push
