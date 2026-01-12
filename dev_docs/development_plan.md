@@ -168,17 +168,18 @@ Content collection schema defined in `src/content/config.ts`:
 ## Phase 5: SEO & Performance
 
 ### 5.1 SEO Basics
-- [ ] Add canonical URLs to all pages
+- [x] Add canonical URLs to all pages
 - [ ] Generate sitemap.xml (use Astro integration)
 - [ ] Create RSS feed for blog posts
-- [ ] Add Open Graph meta tags:
-  - og:title, og:description, og:image (featured photo)
+- [x] Add Open Graph meta tags:
+  - og:title, og:description, og:image (featured photo via Cloudflare transformations)
   - og:type: article for posts
-- [ ] Add Twitter Card meta tags
+  - og:image:width and og:image:height for better platform support
+- [x] Add Twitter Card meta tags (summary_large_image with featured photo)
 
 ### 5.2 Performance Optimization
-- [ ] Set `format=auto` in Image Transformations (serve WebP/AVIF)
-- [ ] Add `loading="lazy"` for below-fold images
+- [x] Set `format=auto` in Image Transformations (serve WebP/AVIF)
+- [x] Add `loading="lazy"` for below-fold images
 - [ ] Run Lighthouse audit on sample post page
 - [ ] Target: Performance ≥ 90, LCP < 2.5s
 - [ ] Optimize CSS (inline critical CSS if needed)
@@ -282,3 +283,4 @@ Content collection schema defined in `src/content/config.ts`:
 - **Responsive Widths**: Stick to 960, 1440, 1920 to control quota
 - **License Override**: Using Fancybox (GPLv3) for non-commercial site
 - **Transformation Quota**: Monitor monthly usage (Free tier = 5,000 unique transformations)
+- **Open Graph Images**: Featured photos are transformed through Cloudflare at 1200px width for social media sharing. Only posts with `featured_photo` field will have OG images. Homepage/archive pages will not have preview images when shared.

@@ -50,13 +50,14 @@ Use custom domain for R2 origin (not `r2.dev` URLs) to enable:
 - **Content**: Markdown/MDX, Git-based
 - **Performance target**: Lighthouse ≥ 90, LCP < 2.5s
 - **Dev testing**: browser-use MCP available for visual testing on localhost:4321
+- **Open Graph**: Posts use `featured_photo` transformed via Cloudflare (1200px width, quality 90) for social media previews. Homepage/archive have no OG images by design.
 
 ## Workflows
 
 ### Creating New Posts
 
 Run `npm run create-post`:
-- Prompts for metadata (title, slug, description, images directory, suffix)
-- Reads images from directory, preserves filenames (sanitized)
+- Prompts for metadata (title, slug, description, images directory, suffix, featured photo, show_in_homepage)
+- Reads images from directory, allows ordering and featured photo selection, preserves filenames (sanitized)
 - Extracts dimensions, uploads to R2 as `{suffix}/{filename}.jpg`
-- Generates markdown with frontmatter, commits and pushes
+- Generates markdown with frontmatter (including featured_photo for Open Graph), commits and pushes

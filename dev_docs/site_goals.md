@@ -83,11 +83,13 @@ Images are stored in Cloudflare R2 and delivered via Cloudflare Image Transforma
 - **Alt text on images**: NOT required (user prefers minimalism, alt is optional)
 - **Frontmatter schema**: title, description, public (boolean), created_at (date), photos (array), featured_photo (optional)
 - **Archive page**: Minimalist title list only (no thumbnails, no descriptions)
+- **Open Graph images**: Posts use `featured_photo` transformed via Cloudflare (1200px width, quality 90). Homepage and archive pages intentionally have no OG images.
 
 ## 9) Content Creation Workflow
 
 **Creating posts:** `npm run create-post`
-- Prompts: title, slug, description, images directory, suffix, show_in_homepage
-- Reads directory, allows ordering, preserves filenames (sanitized)
+- Prompts: title, slug, description, images directory, suffix, featured photo selection, show_in_homepage
+- Reads directory, allows ordering and featured photo selection, preserves filenames (sanitized)
 - Extracts dimensions, uploads to R2, generates markdown, commits/pushes
+- Featured photo is used for Open Graph social media previews
 
