@@ -80,5 +80,3 @@ featured_photo: "prague-krumlov-berlin-in-color/prague-hostal.jpg"
 show_in_homepage: true
 ---
 
-The ginkgos at Český Krumlov Castle were in full bloom when I first visited. Overnight, a cold night, they emptied themselves. I’ll remember those emotions for life.
-
