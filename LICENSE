@@ -1,0 +1,46 @@
+MIT License
+
+Copyright (c) 2026 imnotyourson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+THIRD-PARTY LICENSES
+
+This project uses Fancybox (@fancyapps/ui), which is dual-licensed under:
+1. GPLv3 for non-commercial use (this project)
+2. Commercial license for commercial use
+
+Fancybox License Notice:
+
+Copyright (c) Jānis Skarnelis
+https://fancyapps.com/fancybox/
+
+Fancybox is free for non-commercial use under the GPLv3 license.
+This site is a non-commercial personal photography blog with no revenue
+generation, and complies with the GPLv3 terms by making source code publicly
+available at https://github.com/yourusername/imnotyourson-photos.
+
+For Fancybox's complete license terms, see:
+https://github.com/fancyapps/ui/blob/main/LICENSE.md
+
+If this project becomes commercial, Fancybox must either be:
+- Removed and replaced with an MIT-licensed alternative (e.g., PhotoSwipe)
+- Licensed commercially from https://fancyapps.com/
