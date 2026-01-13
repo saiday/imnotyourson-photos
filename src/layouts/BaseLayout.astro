@@ -68,6 +68,18 @@ const ogImageUrl = image
     <meta property="twitter:title" content={fullTitle} />
     <meta property="twitter:description" content={description} />
     {ogImageUrl && <meta property="twitter:image" content={ogImageUrl} />}
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q28HEXYGM4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-Q28HEXYGM4');
+    </script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "80523abe324f43358c588361d782f564"}'></script>
   </head>
   <body>
     <slot />
