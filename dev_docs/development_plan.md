@@ -230,8 +230,8 @@ Content collection schema defined in `src/content/config.ts`:
 - [ ] Add pagination to Series index (if post count grows)
 
 ### 7.4 Analytics & Monitoring
-- [ ] Add privacy-friendly analytics (Cloudflare Analytics, Plausible, etc.)
-- [ ] Add Google Analytics
+- [x] Add privacy-friendly analytics (Cloudflare Web Analytics)
+- [x] Add Google Analytics (G-Q28HEXYGM4)
 - [ ] Monitor Cloudflare Transformations quota
 - [ ] Set up uptime monitoring
 - [ ] Track Core Web Vitals
