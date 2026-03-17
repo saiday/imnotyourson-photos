@@ -14,10 +14,6 @@ Three workstreams:
 2. **Draft recovery for create-post** — file-based resume mechanism for failed post creation
 3. **Agent-readable setup guide** — a tutorial written for AI agents to execute on behalf of non-technical photographers
 
-## Prerequisites
-
-**Fancybox license:** The project currently uses Fancybox (GPLv3). Distributing a starter kit with a GPLv3 dependency creates license obligations for downstream users who may use it commercially. The project's own `site_goals.md` requires permissive licenses for the viewer component. **Fancybox must be replaced with a permissive-licensed alternative (e.g., PhotoSwipe MIT) before or as part of this work.** This is tracked as a separate task but is a hard dependency for publishing the starter kit.
-
 ## Workstream 1: Centralized Site Config
 
 ### Goal
@@ -339,4 +335,4 @@ Brief descriptions of what each file controls, with links to Astro documentation
 - Multi-tenant / hosted platform mode
 - Custom theming system beyond standard Astro component editing
 - `--list-drafts` CLI flag
-- Fancybox replacement (separate prerequisite task, see Prerequisites section)
+- Fancybox replacement (deferred — current GPLv3 usage is acceptable for now)
