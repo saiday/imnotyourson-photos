@@ -50,6 +50,7 @@ async function uploadToR2(localPath, r2Path) {
     `${BUCKET_NAME}/${r2Path}`,
     '--file', localPath,
     '--content-type', contentType,
+    '--cache-control', 'public, max-age=31536000, immutable',
     '--remote',
   ], { timeout: 60000, cwd: PROJECT_ROOT });
 }
@@ -61,8 +62,11 @@ async function parsePostFrontmatter(filePath) {
   return yaml.load(match[1]);
 }
 
+const forceMode = process.argv.includes('--force');
+
 async function main() {
   console.log(chalk.blue.bold('\nBackfill WebP Variants\n'));
+  if (forceMode) console.log(chalk.yellow('Force mode: re-uploading all variants\n'));
 
   await fs.mkdir(tempDir, { recursive: true });
 
@@ -86,21 +90,23 @@ async function main() {
       const baseName = file.substring(0, file.lastIndexOf('.'));
 
       // Check if variants already exist by trying the smallest width
-      const testR2Path = `${dir}/w${RESPONSIVE_WIDTHS[0]}/${baseName}.webp`;
-      const testLocalPath = path.join(tempDir, `test-${randomUUID()}.webp`);
-      let alreadyExists = false;
-      try {
-        await downloadFromR2(testR2Path, testLocalPath);
-        alreadyExists = true;
-        await fs.unlink(testLocalPath).catch(() => {});
-      } catch (_) {
-        // Doesn't exist, proceed with generation
-      }
+      if (!forceMode) {
+        const testR2Path = `${dir}/w${RESPONSIVE_WIDTHS[0]}/${baseName}.webp`;
+        const testLocalPath = path.join(tempDir, `test-${randomUUID()}.webp`);
+        let alreadyExists = false;
+        try {
+          await downloadFromR2(testR2Path, testLocalPath);
+          alreadyExists = true;
+          await fs.unlink(testLocalPath).catch(() => {});
+        } catch (_) {
+          // Doesn't exist, proceed with generation
+        }
 
-      if (alreadyExists) {
-        console.log(chalk.gray(`  skip: ${filename} (variants exist)`));
-        totalSkipped++;
-        continue;
+        if (alreadyExists) {
+          console.log(chalk.gray(`  skip: ${filename} (variants exist)`));
+          totalSkipped++;
+          continue;
+        }
       }
 
       // Download original

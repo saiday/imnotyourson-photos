@@ -322,6 +322,8 @@ async function uploadToR2(localPath, r2Path) {
     localPath,
     '--content-type',
     contentType,
+    '--cache-control',
+    'public, max-age=31536000, immutable',
     '--remote'
   ], {
     timeout: 60000,

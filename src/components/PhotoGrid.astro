@@ -16,7 +16,7 @@ const maxWidth = RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1];
 ---
 
 <div class="photo-grid" data-fancybox-gallery>
-  {photos.map((photo) => (
+  {photos.map((photo, index) => (
     <a
       style={photo.width && photo.height ? `--width: ${photo.width}; --height: ${photo.height};` : undefined}
       href={getImageUrl(photo.filename, { width: maxWidth })}
@@ -27,7 +27,8 @@ const maxWidth = RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1];
         src={getImageUrl(photo.filename, { width: 960 })}
         srcset={getImageSrcset(photo.filename)}
         sizes={getImageSizes()}
-        loading="lazy"
+        loading={index === 0 ? 'eager' : 'lazy'}
+        fetchpriority={index === 0 ? 'high' : undefined}
       />
     </a>
   ))}

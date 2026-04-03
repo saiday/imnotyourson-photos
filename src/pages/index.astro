@@ -37,6 +37,7 @@ const description = 'It was me, I let the dogs out.';
                 srcset={getImageSrcset(photo.filename)}
                 sizes={getImageSizes()}
                 loading={index === 0 ? 'eager' : 'lazy'}
+                fetchpriority={index === 0 ? 'high' : undefined}
                 alt=""
               />
             </div>
