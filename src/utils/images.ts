@@ -8,7 +8,7 @@
 
 export const RESPONSIVE_WIDTHS = [960, 1440, 1920] as const;
 
-const R2_PUBLIC_URL = import.meta.env.PUBLIC_R2_URL || 'https://photos.imnotyourson.com';
+const R2_PUBLIC_URL = import.meta.env.PUBLIC_R2_URL || 'https://images.imnotyourson.com';
 
 /**
  * Generate URL for a pre-generated WebP variant in R2.
