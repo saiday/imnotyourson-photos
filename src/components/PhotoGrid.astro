@@ -71,26 +71,29 @@ const maxWidth = RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1];
     animated: true,
   });
 
-  // Prefetch gallery-size images as thumbnails become visible
-  const prefetched = new Set<string>();
-  const observer = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      const link = entry.target.closest('a');
-      if (link && !prefetched.has(link.href)) {
-        prefetched.add(link.href);
-        const prefetchLink = document.createElement('link');
-        prefetchLink.rel = 'prefetch';
-        prefetchLink.as = 'image';
-        prefetchLink.href = link.href;
-        document.head.appendChild(prefetchLink);
+  // Prefetch gallery-size images only after page is fully loaded and idle,
+  // so they don't compete with thumbnail downloads for bandwidth
+  window.addEventListener('load', () => {
+    const prefetched = new Set<string>();
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const link = entry.target.closest('a');
+        if (link && !prefetched.has(link.href)) {
+          prefetched.add(link.href);
+          const prefetchLink = document.createElement('link');
+          prefetchLink.rel = 'prefetch';
+          prefetchLink.as = 'image';
+          prefetchLink.href = link.href;
+          document.head.appendChild(prefetchLink);
+        }
+        observer.unobserve(entry.target);
       }
-      observer.unobserve(entry.target);
-    }
-  });
+    });
 
-  document.querySelectorAll('.photo-grid img').forEach(img => {
-    observer.observe(img);
+    document.querySelectorAll('.photo-grid img').forEach(img => {
+      observer.observe(img);
+    });
   });
 </script>
 
