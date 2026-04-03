@@ -1,64 +1,47 @@
 /**
- * Image transformation utilities for Cloudflare Image Transformations
+ * Image URL utilities for pre-generated WebP variants in R2
  *
- * CRITICAL: Uses fixed responsive widths (960, 1440, 1920) to control
- * Cloudflare Transformations quota (5,000 unique transformations/month on Free tier)
+ * Images are pre-generated at upload time (via create-post script) and stored as:
+ *   {prefix}/w{width}/{basename}.webp
+ * Originals remain at their original path: {prefix}/{basename}.jpg
  */
 
-// Fixed responsive widths to control transformation quota
 export const RESPONSIVE_WIDTHS = [960, 1440, 1920] as const;
 
-// Get R2 public URL from environment
 const R2_PUBLIC_URL = import.meta.env.PUBLIC_R2_URL || 'https://photos.imnotyourson.com';
 
-interface TransformOptions {
-  width?: number;
-  format?: 'auto' | 'webp' | 'avif' | 'jpeg' | 'png';
-  quality?: number;
-  fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad';
+/**
+ * Generate URL for a pre-generated WebP variant in R2.
+ * @param filename - Original image filename in R2 (e.g., "slug/photo.jpg")
+ * @param options - { width } defaults to 1920
+ */
+export function getImageUrl(filename: string, options: { width?: number } = {}): string {
+  const { width = 1920 } = options;
+  const lastSlash = filename.lastIndexOf('/');
+  const dir = filename.substring(0, lastSlash);
+  const file = filename.substring(lastSlash + 1);
+  const baseName = file.substring(0, file.lastIndexOf('.'));
+  return `${R2_PUBLIC_URL}/${dir}/w${width}/${baseName}.webp`;
 }
 
 /**
- * Generate Cloudflare Image Transformation URL
- * @param filename - Image filename in R2
- * @param options - Transformation options
- * @returns Transformed image URL
+ * Generate URL for the original image in R2.
  */
-export function getImageUrl(filename: string, options: TransformOptions = {}): string {
-  const {
-    width,
-    format = 'auto',
-    quality = 85, // Default for thumbnails, grid, carousel
-    fit = 'scale-down',
-  } = options;
-
-  // Build transformation parameters
-  const params = new URLSearchParams();
-  if (width) params.set('width', width.toString());
-  params.set('format', format);
-  params.set('quality', quality.toString());
-  params.set('fit', fit);
-
-  const transformParams = params.toString().replace(/&/g, ',');
-
-  return `/cdn-cgi/image/${transformParams}/${R2_PUBLIC_URL}/${filename}`;
+export function getOriginalUrl(filename: string): string {
+  return `${R2_PUBLIC_URL}/${filename}`;
 }
 
 /**
- * Generate srcset string with fixed responsive widths
- * @param filename - Image filename in R2
- * @param options - Base transformation options
- * @returns srcset string for responsive images
+ * Generate srcset string with pre-generated responsive widths.
  */
-export function getImageSrcset(filename: string, options: Omit<TransformOptions, 'width'> = {}): string {
+export function getImageSrcset(filename: string): string {
   return RESPONSIVE_WIDTHS
-    .map(width => `${getImageUrl(filename, { ...options, width })} ${width}w`)
+    .map(width => `${getImageUrl(filename, { width })} ${width}w`)
     .join(', ');
 }
 
 /**
- * Get sizes attribute for responsive images
- * Default responsive breakpoints for photo grid
+ * Get sizes attribute for responsive images.
  */
 export function getImageSizes(): string {
   return '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw';

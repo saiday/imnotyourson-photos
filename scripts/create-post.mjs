@@ -16,6 +16,8 @@ import sharp from 'sharp';
 // ===== CONSTANTS =====
 const BUCKET_NAME = 'imnotyourson-photos';
 const POSTS_DIR = 'src/content/posts';
+const RESPONSIVE_WIDTHS = [960, 1440, 1920];
+const WEBP_QUALITY = 85;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.join(__dirname, '..');
 
@@ -253,16 +255,37 @@ async function collectImages(suffix) {
       const tempPath = path.join(tempDir, finalFilename);
       await fs.writeFile(tempPath, buffer);
 
-      // Track for upload
+      // Generate WebP variants at each responsive width
+      const baseName = path.basename(finalFilename, '.jpg');
+      const variants = [];
+      for (const w of RESPONSIVE_WIDTHS) {
+        const webpFilename = `w${w}-${baseName}.webp`;
+        const webpPath = path.join(tempDir, webpFilename);
+        await sharp(buffer)
+          .resize(w, null, { fit: 'inside', withoutEnlargement: true })
+          .webp({ quality: WEBP_QUALITY })
+          .toFile(webpPath);
+        const webpStat = await fs.stat(webpPath);
+        variants.push({
+          localPath: webpPath,
+          r2Path: `${suffix}/w${w}/${baseName}.webp`,
+          size: webpStat.size,
+        });
+      }
+
+      // Track original + variants for upload
       images.push({
         localPath: tempPath,
         r2Path: `${suffix}/${finalFilename}`,
         size: buffer.length,
         width,
-        height
+        height,
+        variants,
       });
 
+      const variantSizes = variants.map(v => `w${RESPONSIVE_WIDTHS[variants.indexOf(v)]}:${formatBytes(v.size)}`).join(', ');
       console.log(chalk.green(`✓ Image ${index + 1}/${orderedFiles.length}: ${finalFilename} (${mime}, ${formatBytes(buffer.length)}, ${width}×${height})`));
+      console.log(chalk.gray(`  WebP variants: ${variantSizes}`));
       console.log(chalk.gray(`  Source: ${file.originalName}`));
     } catch (error) {
       console.error(chalk.red(`✗ Failed to process ${file.originalName}: ${error.message}`));
@@ -288,6 +311,7 @@ async function collectImages(suffix) {
 // ===== R2 UPLOAD =====
 
 async function uploadToR2(localPath, r2Path) {
+  const contentType = r2Path.endsWith('.webp') ? 'image/webp' : 'image/jpeg';
   await execa('npx', [
     'wrangler',
     'r2',
@@ -296,6 +320,8 @@ async function uploadToR2(localPath, r2Path) {
     `${BUCKET_NAME}/${r2Path}`,
     '--file',
     localPath,
+    '--content-type',
+    contentType,
     '--remote'
   ], {
     timeout: 60000,
@@ -303,31 +329,48 @@ async function uploadToR2(localPath, r2Path) {
   });
 }
 
+async function uploadWithRetry(localPath, r2Path) {
+  try {
+    await uploadToR2(localPath, r2Path);
+  } catch (error) {
+    // Retry once
+    await uploadToR2(localPath, r2Path);
+  }
+}
+
 async function uploadImages(images) {
-  console.log(chalk.cyan(`\nUploading ${images.length} image(s) to R2...\n`));
+  // Count total uploads: originals + variants
+  const totalUploads = images.reduce((sum, img) => sum + 1 + (img.variants?.length || 0), 0);
+  console.log(chalk.cyan(`\nUploading ${images.length} image(s) + WebP variants (${totalUploads} files total) to R2...\n`));
 
-  for (let i = 0; i < images.length; i++) {
-    const spinner = ora(`Uploading ${i + 1}/${images.length}: ${images[i].r2Path}`).start();
-
+  let uploadCount = 0;
+  for (const image of images) {
+    // Upload original
+    uploadCount++;
+    const origSpinner = ora(`[${uploadCount}/${totalUploads}] ${image.r2Path}`).start();
     try {
-      await uploadToR2(images[i].localPath, images[i].r2Path);
-      spinner.succeed();
+      await uploadWithRetry(image.localPath, image.r2Path);
+      origSpinner.succeed();
     } catch (error) {
-      spinner.fail();
+      origSpinner.fail();
+      throw new Error(`Upload failed: ${error.message}`);
+    }
 
-      // Retry once
-      const retrySpinner = ora(`Retrying upload: ${images[i].r2Path}`).start();
+    // Upload WebP variants
+    for (const variant of (image.variants || [])) {
+      uploadCount++;
+      const variantSpinner = ora(`[${uploadCount}/${totalUploads}] ${variant.r2Path}`).start();
       try {
-        await uploadToR2(images[i].localPath, images[i].r2Path);
-        retrySpinner.succeed();
-      } catch (retryError) {
-        retrySpinner.fail();
-        throw new Error(`Upload failed after retry: ${retryError.message}`);
+        await uploadWithRetry(variant.localPath, variant.r2Path);
+        variantSpinner.succeed();
+      } catch (error) {
+        variantSpinner.fail();
+        throw new Error(`Upload failed: ${error.message}`);
       }
     }
   }
 
-  console.log(chalk.green('\n✓ All images uploaded successfully\n'));
+  console.log(chalk.green('\n✓ All images and WebP variants uploaded successfully\n'));
 }
 
 // ===== MARKDOWN GENERATION =====

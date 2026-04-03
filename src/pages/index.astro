@@ -33,9 +33,9 @@ const description = 'It was me, I let the dogs out.';
           <div class="hero-item">
             <div class="hero-image-wrapper">
               <img
-                src={getImageUrl(photo.filename, { width: 1920 })}
+                src={getImageUrl(photo.filename)}
                 srcset={getImageSrcset(photo.filename)}
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                sizes={getImageSizes()}
                 loading={index === 0 ? 'eager' : 'lazy'}
                 alt=""
               />

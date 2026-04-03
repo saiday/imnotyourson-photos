@@ -17,16 +17,18 @@ Context for AI assistants working on this project.
 
 ## Critical Rules
 
-### 1. NO Build-Time Image Optimization
-**Never** use Astro's `getImage` or build-time image processing. All images:
-- Store originals in Cloudflare R2
-- Deliver via Cloudflare Image Transformations (`/cdn-cgi/image/...`)
-- Never duplicate or process locally
+### 1. Pre-Generated WebP, Not Runtime Transformations
+Images are pre-generated as WebP at upload time using Sharp, stored in R2, and served directly via CDN. No `/cdn-cgi/image/` transformations at runtime.
+- Upload pipeline generates WebP at fixed widths (960, 1440, 1920) with quality 85
+- R2 structure: `{prefix}/{name}.jpg` (original) + `{prefix}/w{width}/{name}.webp` (variants)
+- Originals kept in R2 as master copies
+- `getImageUrl()` returns direct R2 URLs, not transformation URLs
+- This eliminates cold-start latency, transformation timeouts, and quota limits
 
 ### 2. Fixed Responsive Widths Only
-Use a standardized set of widths (e.g., 960, 1440, 1920) to control Cloudflare Transformations quota.
+Use the standardized set of widths (960, 1440, 1920) for all pre-generated variants.
 - Don't generate arbitrary per-device widths
-- Don't vary transformation parameters unnecessarily
+- Grid and gallery share the same pre-generated files (cache reuse)
 
 ### 3. License Requirements
 Gallery/viewer components must use permissive licenses (MIT/Apache/BSD).
@@ -46,11 +48,11 @@ Use custom domain for R2 origin (not `r2.dev` URLs) to enable:
 
 ## Quick Reference
 
-- **Stack**: Astro + Cloudflare Pages + R2 + Image Transformations
+- **Stack**: Astro + Cloudflare Pages + R2 (direct CDN, no Image Transformations)
 - **Content**: Markdown/MDX, Git-based
-- **Performance target**: Lighthouse ≥ 90, LCP < 2.5s
+- **Performance target**: Lighthouse >= 90, LCP < 2.5s
 - **Dev testing**: browser-use MCP available for visual testing on localhost:4321
-- **Open Graph**: Posts use `featured_photo` transformed via Cloudflare (1200px width, quality 90) for social media previews. Homepage/archive have no OG images by design.
+- **Open Graph**: Posts use `featured_photo` as 1920w WebP for social previews. Homepage/archive have no OG images by design.
 
 ## Workflows
 
@@ -59,5 +61,12 @@ Use custom domain for R2 origin (not `r2.dev` URLs) to enable:
 Run `npm run create-post`:
 - Prompts for metadata (title, slug, description, images directory, suffix, featured photo, show_in_homepage)
 - Reads images from directory, allows ordering and featured photo selection, preserves filenames (sanitized)
-- Extracts dimensions, uploads to R2 as `{suffix}/{filename}.jpg`
-- Generates markdown with frontmatter (including featured_photo for Open Graph), commits and pushes
+- Extracts dimensions, generates WebP variants at 960/1440/1920
+- Uploads originals + WebP variants to R2
+- Generates markdown with frontmatter, commits and pushes
+
+### Backfilling Existing Posts
+
+Run `node scripts/backfill-webp.mjs`:
+- Downloads originals from R2, generates WebP variants, uploads back
+- Skips images that already have variants

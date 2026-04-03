@@ -11,20 +11,22 @@ interface Props {
 }
 
 const { photos } = Astro.props;
+
+const maxWidth = RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1];
 ---
 
 <div class="photo-grid" data-fancybox-gallery>
   {photos.map((photo) => (
     <a
       style={photo.width && photo.height ? `--width: ${photo.width}; --height: ${photo.height};` : undefined}
-      href={getImageUrl(photo.filename, { width: RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1], quality: 90 })}
+      href={getImageUrl(photo.filename, { width: maxWidth })}
       data-fancybox="gallery"
       class={photo.width && photo.height ? "photo-item" : "photo-item photo-item-fallback"}
     >
       <img
         src={getImageUrl(photo.filename, { width: 960 })}
-        srcset={`${getImageUrl(photo.filename, { width: 960 })} 960w`}
-        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        srcset={getImageSrcset(photo.filename)}
+        sizes={getImageSizes()}
         loading="lazy"
       />
     </a>
@@ -66,6 +68,28 @@ const { photos } = Astro.props;
     },
 
     animated: true,
+  });
+
+  // Prefetch gallery-size images as thumbnails become visible
+  const prefetched = new Set<string>();
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      const link = entry.target.closest('a');
+      if (link && !prefetched.has(link.href)) {
+        prefetched.add(link.href);
+        const prefetchLink = document.createElement('link');
+        prefetchLink.rel = 'prefetch';
+        prefetchLink.as = 'image';
+        prefetchLink.href = link.href;
+        document.head.appendChild(prefetchLink);
+      }
+      observer.unobserve(entry.target);
+    }
+  });
+
+  document.querySelectorAll('.photo-grid img').forEach(img => {
+    observer.observe(img);
   });
 </script>
 
