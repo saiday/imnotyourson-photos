@@ -99,10 +99,10 @@ const maxWidth = RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1];
 
 <style>
   .photo-grid {
-    --min-height: clamp(200px, 20vw, 400px);
+    --min-height: clamp(120px, 12vw, 240px);
     display: flex;
     flex-wrap: wrap;
-    gap: max(1.5vw, 12px);
+    gap: max(0.8vw, 6px);
     margin: 2rem 0;
   }
 
@@ -112,7 +112,7 @@ const maxWidth = RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1];
     aspect-ratio: var(--width) / var(--height);
     position: relative;
     overflow: hidden;
-    border-radius: 4px;
+    border-radius: 0;
     cursor: pointer;
     background-color: var(--color-border);
   }
@@ -150,15 +150,15 @@ const maxWidth = RESPONSIVE_WIDTHS[RESPONSIVE_WIDTHS.length - 1];
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .photo-grid {
-      --min-height: clamp(150px, 30vw, 300px);
-      gap: 0.75rem;
+      --min-height: clamp(100px, 20vw, 180px);
+      gap: 0.4rem;
     }
   }
 
   @media (min-width: 769px) and (max-width: 1024px) {
     .photo-grid {
-      --min-height: clamp(180px, 25vw, 350px);
-      gap: 1rem;
+      --min-height: clamp(110px, 15vw, 220px);
+      gap: 0.5rem;
     }
   }
 
